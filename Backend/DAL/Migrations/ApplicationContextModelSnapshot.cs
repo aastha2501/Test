@@ -24,7 +24,7 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.Order", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -38,7 +38,7 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -47,7 +47,7 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.OrderDetails", b =>
                 {
-                    b.Property<Guid>("OrderDetailsId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -63,7 +63,7 @@ namespace DAL.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderDetailsId");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
@@ -74,11 +74,17 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Models.Product", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -91,7 +97,7 @@ namespace DAL.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("Id");
 
                     b.ToTable("Products");
                 });
@@ -168,17 +174,17 @@ namespace DAL.Migrations
                         {
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cb7b0dcf-1322-4a68-a5ec-388572437cab",
+                            ConcurrencyStamp = "39ab5cdd-474f-45af-8fd6-9203a4790846",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin@gmail.com",
-                            PasswordHash = "AQAAAAEAACcQAAAAEB6LhDgb8t9a85lzlADYsQukVNzy6XRD2eVNlcVEhc8MsMUsvQHLr8WjBnn4FmYXng==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEMXi+By7SxQa4VM6yWrGKAa8BSrq6Bi5hgbqq2rzdT7hi+IqnDkyyrj8UrAUpWMQdg==",
                             PhoneNumber = "1234567890",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3c1d537f-a58e-4232-a367-20099fb13de3",
+                            SecurityStamp = "dae9c7af-cb4c-4523-813b-cb1f6d4a2189",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });

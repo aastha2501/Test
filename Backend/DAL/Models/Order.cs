@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-    public class Order
+    public class Order : BaseEntity
     {
-        [Key]
-        public Guid OrderId { get; set; }
         [ForeignKey("User")]
         public string UserId { get; set; }
         public User User { get; set; }

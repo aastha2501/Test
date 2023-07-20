@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using BAL.Services;
+using DAL.Models;
 using DAL.Models.DTO;
 using DAL.Repository;
 
@@ -19,24 +20,17 @@ namespace Backend.Controllers
     [Authorize(Roles = "User, Admin")]
     public class SalesmanController : ControllerBase
     {
-        private readonly IProductRepo _productRepo = null;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IProductService _productService = null;
 
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-
-        public SalesmanController(IProductRepo productRepo, SignInManager<User> signInManager, UserManager<User> userManager, IHttpContextAccessor httpContextAccessor)
+        public SalesmanController(IProductService productService)
         {
-            _productRepo = productRepo;
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
+            _productService = productService;
         }
-        //dashboard - display all the products
+      
         [HttpGet("/dashboard")]
         public async Task<IActionResult> Dashboard()
         {
-            var list = await _productRepo.GetAllProducts();
+            var list = await _productService.GetAllProducts();
             if (list != null)
             {
                 return Ok(list);
@@ -47,8 +41,7 @@ namespace Backend.Controllers
         [HttpGet("prod/{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            //var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var prod = await _productRepo.GetProdById(id);
+            var prod = await _productService.GetProdById(id);
             if (prod != null)
             {
                 return Ok(prod);
@@ -56,62 +49,25 @@ namespace Backend.Controllers
             return BadRequest();
         }
           
-
             [HttpPost("invoice")]
              
             public async Task<IActionResult> SaveInvoice(RequestProductOorder orders)
             {
-            
-            var userId = User.FindFirstValue(ClaimTypes.Name);
-
-            //quantity
-            var qty = orders.RequestProducts.Sum(ip => ip.Quantity);
-
-            var order = new Order() 
-            {
-                OrderId = Guid.NewGuid(),
-                UserId = userId,
-                Quantity = qty
-             
-            };
-            order.OrderDetails = orders.RequestProducts.Select((ip) => new OrderDetails()
-            {
-                OrderDetailsId = Guid.NewGuid(),
-                OrderId = order.OrderId,
-                ProductId = ip.ProductId,
-                Quantity = ip.Quantity
-                
-            }).ToList();
-
+                var userId = User.FindFirstValue(ClaimTypes.Name);
+                var res = await _productService.SaveInvoice(orders, userId);
            
-            foreach (var orderDetail in order.OrderDetails)
-            {
-                var prodId = orderDetail.ProductId;
-                var qtyy = orderDetail.Quantity;
-
-                var allProducts = await _productRepo.GetAllProducts();
-
-                var productToUpdate = allProducts.FirstOrDefault(p => p.ProductId == prodId);
-                if (productToUpdate != null)
+                if (res != null)
                 {
-                    productToUpdate.Quantity -= qtyy;
-                }
-
-            }
-
-            var res = await _productRepo.SaveInvoice(order);
-            if (res != null)
-            {
                 return Ok(res);
-            }
+                }
             return BadRequest();
-        }
+           }
 
 
         [HttpPost("update")]
         public async Task<IActionResult> Update(List<Product> list)
         {
-            var res = await _productRepo.Update(list);
+            var res = await _productService.Update(list);
             if (res != null)
             {
                 return Ok(res);
@@ -122,7 +78,7 @@ namespace Backend.Controllers
         [HttpGet("invoices/{id:guid}")]
         public async Task<IActionResult> GetInvoiceByUserId(Guid id)
         {
-            var res = await _productRepo.GetInvoiceByUserId(id);
+            var res = await _productService.GetInvoiceByUserId(id);
             if (res != null)
             {
                 return Ok(res);
@@ -133,7 +89,7 @@ namespace Backend.Controllers
         [HttpDelete("deleteInvoice/{id:guid}")]
         public async Task<IActionResult> CancleOrder(Guid id)
         {
-            var res = await _productRepo.CancleOrder(id);
+            var res = await _productService.CancleOrder(id);
             if (res != null)
             {
                 return Ok(res);

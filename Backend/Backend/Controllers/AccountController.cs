@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using Common.DTO;
+using DAL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace Backend.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLogin model)
-            {
+        {
             var user = await _userManager.FindByEmailAsync(model.Email);
             
             if(user == null)
@@ -52,10 +53,11 @@ namespace Backend.Controllers
                 var token = GenerateJwtToken(authClaims);
                 return Ok(new { Token = token });
             }
+          
             return BadRequest();
         }
 
-        //[Authorize(Roles="Admin")]
+       
         [HttpPost("signup")]
         public async Task<IActionResult> Register(SignupModel model)
         {
@@ -70,11 +72,6 @@ namespace Backend.Controllers
                 Email = model.Email,
                 NormalizedEmail = model.Email
             };
-            //var num = new Random();
-            //var x = num.Next(0, 1000000);
-            //string str = x.ToString("000000");
-
-
 
             var result = await _userManager.CreateAsync(user, model.Password);
             var AllRolefind = _roleManager.Roles.Select(x => x.Name).ToList();
@@ -82,12 +79,39 @@ namespace Backend.Controllers
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, AllRolefind[0]);
-                return Ok();
+                 await _userManager.AddToRoleAsync(user, AllRolefind[0]);
+                 return Ok();
             }
            
             return BadRequest(result.Errors);
         }
+
+
+        //[HttpGet]
+        //[AllowAnonymous]
+        //[Route("ConfirmEmail")]
+        //public async Task<IActionResult> ConfirmEmail(string token, string email)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    if (user == null)
+        //    {
+        //        // Handle user not found error
+        //        return BadRequest("User not found.");
+        //    }
+
+        //    var result = await _userManager.ConfirmEmailAsync(user, token);
+        //    if (result.Succeeded)
+        //    {
+        //        // Email confirmed successfully
+        //        // You can redirect to a success page or perform any necessary actions
+        //        return Ok("Email confirmed successfully.");
+        //    }
+        //    else
+        //    {
+        //        // Handle email confirmation failure
+        //        return BadRequest("Email confirmation failed.");
+        //    }
+        //}
 
         //Generate jwt token
         private async Task<string> GenerateJwtToken(IEnumerable<Claim> claims)
@@ -95,8 +119,7 @@ namespace Backend.Controllers
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
             var token = new JwtSecurityToken(
-              
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddMinutes(10),
                 claims: claims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature)
             );

@@ -1,3 +1,5 @@
+using BAL.Services;
+using BAL.Services.Implementation;
 using DAL.DbContextClass;
 using DAL.Models;
 using DAL.Repository;
@@ -23,6 +25,12 @@ builder.Services.AddScoped<HttpClient>();
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationContext>();
 
+//enable email confirmation
+//builder.Services.Configure<IdentityOptions>(options =>
+//{
+//    options.SignIn.RequireConfirmedEmail = true;
+//});
+
 // JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -45,7 +53,9 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddScoped<IProductRepo, ProductRepo>();
+
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
@@ -100,14 +110,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
+
 app.UseCors();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-
 
 app.MapControllers();
 
